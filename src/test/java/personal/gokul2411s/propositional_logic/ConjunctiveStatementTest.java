@@ -14,13 +14,14 @@ public class ConjunctiveStatementTest {
         // Given
         Symbol a = symbol("A");
         Symbol b = symbol("B");
-        Statement s = conjuncted(a, b);
+        Symbol c = symbol("C");
+        Statement s = conjuncted(a, b, c);
 
         // When
         String sp = s.prettyPrinted();
 
         // Then
-        assertThat(sp, equalTo("(A AND B)"));
+        assertThat(sp, equalTo("(A AND B AND C)"));
     }
 
     @Test

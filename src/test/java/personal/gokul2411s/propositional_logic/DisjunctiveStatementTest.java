@@ -14,13 +14,14 @@ public class DisjunctiveStatementTest {
         // Given
         Symbol a = symbol("A");
         Symbol b = symbol("B");
-        Statement s = disjuncted(a, b);
+        Symbol c = symbol("C");
+        Statement s = disjuncted(a, b, c);
 
         // When
         String sp = s.prettyPrinted();
 
         // Then
-        assertThat(sp, equalTo("(A OR B)"));
+        assertThat(sp, equalTo("(A OR B OR C)"));
     }
 
     @Test

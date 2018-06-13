@@ -1,39 +1,65 @@
 package personal.gokul2411s.propositional_logic;
 
-import lombok.AllArgsConstructor;
+import com.google.common.base.Joiner;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @Value
-@AllArgsConstructor
 class ConjunctiveStatement implements Statement {
 
     @NonNull
-    private final Statement statement1;
+    private final List<Statement> statements;
 
-    @NonNull
-    private final Statement statement2;
+    ConjunctiveStatement(Statement statement1, Statement statement2, Statement... others) {
+        statements = new ArrayList<>();
+        statements.add(statement1);
+        statements.add(statement2);
+        statements.addAll(Arrays.asList(others));
+    }
 
     @Override
     public Statement evaluatedUnder(Model model) {
-        Statement statement1Evaluated = statement1.evaluatedUnder(model);
-        Statement statement2Evaluated = statement2.evaluatedUnder(model);
+        List<Statement> evaluatedStatements = new ArrayList<>();
+        for (Statement statement : statements) {
+            Statement evaluatedStatement = statement.evaluatedUnder(model);
+            if (evaluatedStatement.equals(LogicalSymbol.FALSE)) {
+                return LogicalSymbol.FALSE;
+            }
+            if (!evaluatedStatement.equals(LogicalSymbol.TRUE)) {
+                evaluatedStatements.add(statement.evaluatedUnder(model));
+            }
+        }
+        if (evaluatedStatements.isEmpty()) {
+            return LogicalSymbol.TRUE;
+        } else if (evaluatedStatements.size() == 1) {
+            return evaluatedStatements.get(0);
+        }
 
-        if (statement1Evaluated.equals(LogicalSymbol.FALSE) || statement2Evaluated.equals(LogicalSymbol.FALSE)) {
-            return LogicalSymbol.FALSE;
-        }
-        if (statement1Evaluated.equals(LogicalSymbol.TRUE)) {
-            return statement2Evaluated;
-        }
-        if (statement2Evaluated.equals(LogicalSymbol.TRUE)) {
-            return statement1Evaluated;
-        }
-
-        return new ConjunctiveStatement(statement1Evaluated, statement2Evaluated);
+        Statement[] otherEvaluatedStatements = new Statement[evaluatedStatements.size() - 2];
+        otherEvaluatedStatements =
+                IntStream.range(2, evaluatedStatements.size())
+                        .mapToObj(i -> evaluatedStatements.get(i))
+                        .collect(Collectors.toList())
+                        .toArray(otherEvaluatedStatements);
+        return new ConjunctiveStatement(
+                evaluatedStatements.get(0),
+                evaluatedStatements.get(1),
+                otherEvaluatedStatements);
     }
 
     @Override
     public String prettyPrinted() {
-        return String.format("(%s AND %s)", statement1.prettyPrinted(), statement2.prettyPrinted());
+        String joined =
+                Joiner.on(" AND ").join(
+                        statements.stream()
+                                .map(s -> s.prettyPrinted())
+                                .collect(Collectors.toList()));
+        return "(" + joined + ")";
     }
 }
