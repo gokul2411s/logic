@@ -18,5 +18,13 @@ public final class StatementFactory {
         return new NegativeStatement(statement);
     }
 
+    public static Statement implication(Statement statement1, Statement statement2) {
+        return disjuncted(negated(statement1), statement2);
+    }
+
+    public static Statement twoWayImplication(Statement statement1, Statement statement2) {
+        return conjuncted(implication(statement1, statement2), implication(statement2, statement1));
+    }
+
     private StatementFactory() { }
 }
