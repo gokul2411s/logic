@@ -6,6 +6,7 @@ import lombok.Value;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,16 +41,38 @@ class ConjunctiveStatement implements Statement {
         } else if (evaluatedStatements.size() == 1) {
             return evaluatedStatements.get(0);
         }
+        return conjunctiveStatementfrom(evaluatedStatements);
+    }
 
-        Statement[] otherEvaluatedStatements = new Statement[evaluatedStatements.size() - 2];
+    @Override
+    public boolean isConjunctive() {
+        return true;
+    }
+
+    @Override
+    public boolean isDisjunctive() {
+        return false;
+    }
+
+    @Override
+    public Statement inCnf() {
+        List<Statement> statementsInCnf =
+                statements.stream()
+                    .map(s -> s.inCnf())
+                    .collect(Collectors.toList());
+        return conjunctiveStatementfrom(statementsInCnf);
+    }
+
+    private static Statement conjunctiveStatementfrom(List<Statement> statements) {
+        Statement[] otherEvaluatedStatements = new Statement[statements.size() - 2];
         otherEvaluatedStatements =
-                IntStream.range(2, evaluatedStatements.size())
-                        .mapToObj(i -> evaluatedStatements.get(i))
+                IntStream.range(2, statements.size())
+                        .mapToObj(i -> statements.get(i))
                         .collect(Collectors.toList())
                         .toArray(otherEvaluatedStatements);
         return new ConjunctiveStatement(
-                evaluatedStatements.get(0),
-                evaluatedStatements.get(1),
+                statements.get(0),
+                statements.get(1),
                 otherEvaluatedStatements);
     }
 
@@ -61,5 +84,10 @@ class ConjunctiveStatement implements Statement {
                                 .map(s -> s.prettyPrinted())
                                 .collect(Collectors.toList()));
         return "(" + joined + ")";
+    }
+
+    @Override
+    public Iterator<Statement> iterator() {
+        return statements.iterator();
     }
 }

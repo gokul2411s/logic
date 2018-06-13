@@ -14,6 +14,24 @@ public class SymbolTest {
     }
 
     @Test
+    public void symbol_shouldContainNoSubStatements() {
+        assertThat(symbol("A").iterator().hasNext(), equalTo(false));
+    }
+
+    @Test
+    public void symbol_shouldBeNeitherConjunctiveNorDisjunctive() {
+        Symbol a = symbol("A");
+        assertThat(a.isConjunctive(), equalTo(false));
+        assertThat(a.isDisjunctive(), equalTo(false));
+    }
+
+    @Test
+    public void symbol_inCnf_shouldBeTheSame() {
+        Symbol a = symbol("A");
+        assertThat(a.inCnf(), equalTo(a));
+    }
+
+    @Test
     public void symbol_shouldEvaluateToLogicalSymbol_whenModelSpecifiesAValueForIt() {
         // Given
         Symbol a = symbol("A");

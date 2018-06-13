@@ -2,10 +2,11 @@ package personal.gokul2411s.propositional_logic;
 
 import org.junit.Test;
 
+import java.util.Iterator;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static personal.gokul2411s.propositional_logic.StatementFactory.conjuncted;
-import static personal.gokul2411s.propositional_logic.StatementFactory.symbol;
+import static personal.gokul2411s.propositional_logic.StatementFactory.*;
 
 public class ConjunctiveStatementTest {
 
@@ -22,6 +23,51 @@ public class ConjunctiveStatementTest {
 
         // Then
         assertThat(sp, equalTo("(A AND B AND C)"));
+    }
+
+    @Test
+    public void conjunctiveStatement_shouldReturnSubStatementsInOrder() {
+        // Given
+        Symbol a = symbol("A");
+        Symbol b = symbol("B");
+        Symbol c = symbol("C");
+        Statement s = conjuncted(a, b, c);
+
+        // When
+        Iterator<Statement> iter = s.iterator();
+
+        // Then
+        assertThat(iter.next(), equalTo(a));
+        assertThat(iter.next(), equalTo(b));
+        assertThat(iter.next(), equalTo(c));
+        assertThat(iter.hasNext(), equalTo(false));
+    }
+
+    @Test
+    public void conjunctiveStatement_shouldBeConjunctive() {
+        assertThat(conjuncted(symbol("a"), symbol("b")).isConjunctive(), equalTo(true));
+    }
+
+    @Test
+    public void conjunctiveStatement_shouldNotBeDisjunctive() {
+        assertThat(conjuncted(symbol("a"), symbol("b")).isDisjunctive(), equalTo(false));
+    }
+
+    @Test
+    public void conjunctiveStatement_inCnf_shouldRecursivelyConvertSubStatementsToCnf() {
+        // Given
+        Symbol a = symbol("A");
+        Symbol b = symbol("B");
+        Symbol c = symbol("C");
+        Symbol d = symbol("D");
+        Statement n = negated(conjuncted(c, d));
+        Statement s = conjuncted(a, b, n);
+
+        // When
+        Statement sInCnf = s.inCnf();
+
+        // Then
+        assertThat(sInCnf, equalTo(conjuncted(a.inCnf(), b.inCnf(), n.inCnf())));
     }
 
     @Test

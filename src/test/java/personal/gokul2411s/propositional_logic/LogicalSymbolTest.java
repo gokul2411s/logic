@@ -14,6 +14,26 @@ public class LogicalSymbolTest {
     }
 
     @Test
+    public void logicalSymbol_shouldContainNoSubStatements() {
+        assertThat(LogicalSymbol.TRUE.iterator().hasNext(), equalTo(false));
+        assertThat(LogicalSymbol.FALSE.iterator().hasNext(), equalTo(false));
+    }
+
+    @Test
+    public void logicalSymbol_shouldBeNeitherConjunctiveNorDisjunctive() {
+        assertThat(LogicalSymbol.TRUE.isConjunctive(), equalTo(false));
+        assertThat(LogicalSymbol.TRUE.isDisjunctive(), equalTo(false));
+        assertThat(LogicalSymbol.FALSE.isConjunctive(), equalTo(false));
+        assertThat(LogicalSymbol.FALSE.isDisjunctive(), equalTo(false));
+    }
+
+    @Test
+    public void logicalSymbol_inCnf_shouldBeTheSame() {
+        assertThat(LogicalSymbol.TRUE.inCnf(), equalTo(LogicalSymbol.TRUE));
+        assertThat(LogicalSymbol.FALSE.inCnf(), equalTo(LogicalSymbol.FALSE));
+    }
+
+    @Test
     public void logicalSymbol_shouldReturnItselfUnderEvaluation() {
         Model model = Model.builder().build();
         assertThat(LogicalSymbol.TRUE.evaluatedUnder(model), equalTo(LogicalSymbol.TRUE));

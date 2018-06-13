@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 @Value
 @AllArgsConstructor
 public class Symbol implements Statement {
@@ -22,7 +25,27 @@ public class Symbol implements Statement {
     }
 
     @Override
+    public Statement inCnf() {
+        return this;
+    }
+
+    @Override
+    public boolean isConjunctive() {
+        return false;
+    }
+
+    @Override
+    public boolean isDisjunctive() {
+        return false;
+    }
+
+    @Override
     public String prettyPrinted() {
         return value;
+    }
+
+    @Override
+    public Iterator<Statement> iterator() {
+        return Collections.emptyIterator();
     }
 }
